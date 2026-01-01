@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1 Year Anniversary 💙</title>
+
+<style>
+/* ================= หน้า 1 เปิดสิ ================= */
+.screen{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+#screen-open{
+  background:linear-gradient(135deg,#c7d2fe,#a78bfa);
+}
+#screen-heart{
+  background:linear-gradient(135deg,#f5d0fe,#c4b5fd);
+  display:none;
+}
+#screen-lock{
+  background:linear-gradient(135deg,#e9d5ff,#c4b5fd);
+  display:none;
+}
+#screen-firework{
+  background:#000;
+  display:none;
+}
+
+/* การ์ดกลาง */
+.box{
+  background:rgba(255,255,255,.25);
+  backdrop-filter:blur(30px);
+  padding:60px 50px;
+  border-radius:50px;
+  text-align:center;
+  color:#fff;
+  box-shadow:0 40px 120px rgba(0,0,0,.3);
+}
+.box button{
+  margin-top:30px;
+  padding:20px 70px;
+  border:none;
+  border-radius:50px;
+  font-size:20px;
+  background:#fff;
+  color:#7c3aed;
+}
+
+/* ================= หลอดหัวใจ ================= */
+.heart-bar{
+  width:260px;
+  height:26px;
+  background:rgba(255,255,255,.4);
+  border-radius:30px;
+  overflow:hidden;
+  margin:20px auto;
+}
+.heart-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ec4899,#8b5cf6);
+  transition:.3s;
+}
+
+/* ================= ใส่รหัส ================= */
+.dots{display:flex;gap:10px;justify-content:center;margin:16px 0;}
+.dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.4);}
+.dot.on{background:#fff;}
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.keypad button{
+  padding:14px;
+  border:none;
+  border-radius:16px;
+  font-size:18px;
+}
+
+/* ================= พลุ ================= */
+.firework{
+  position:absolute;
+  bottom:0;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  animation:boom 1.5s forwards;
+}
+@keyframes boom{
+  to{
+    transform:translateY(-80vh) scale(12);
+    opacity:0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- หน้า 1 เปิดสิ -->
+<div id="screen-open" class="screen">
+  <div class="box">
+    <h1>เปิดสิ 💙</h1>
+    <button onclick="goHeart()">✨ เปิดสิ</button>
+  </div>
+</div>
+
+<!-- หน้า 2 หลอดหัวใจ -->
+<div id="screen-heart" class="screen">
+  <div class="box" onclick="addHeart()">
+    <h2>เติมหัวใจ 💜</h2>
+    <div class="heart-bar">
+      <div class="heart-fill" id="heartFill"></div>
+    </div>
+    <p>แตะหน้าจอเพื่อเพิ่มหัวใจ</p>
+  </div>
+</div>
+
+<!-- หน้า 3 ใส่รหัส -->
+<div id="screen-lock" class="screen">
+  <div class="box">
+    <h2>ใส่รหัสลับ</h2>
+    <div class="dots">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="keypad">
+      <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+      <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+      <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+      <button onclick="resetPin()">⌫</button><button onclick="press(0)">0</button><button onclick="resetPin()">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- หน้า 4 พลุ -->
+<div id="screen-firework" class="screen"></div>
+
+<script>
+/* ---------- หน้าเปิดสิ → หลอดหัวใจ ---------- */
+function goHeart(){
+  screen_open.style.display="none";
+  screen_heart.style.display="flex";
+}
+
+/* ---------- หลอดหัวใจ ---------- */
+let heart=0;
+function addHeart(){
+  heart+=10;
+  heartFill.style.width=heart+"%";
+  if(heart>=100){
+    screen_heart.style.display="none";
+    screen_lock.style.display="flex";
+  }
+}
+
+/* ---------- ใส่รหัส ---------- */
+const PASS="080225";
+let input="";
+function press(n){
+  if(input.length>=PASS.length)return;
+  input+=n;
+  document.querySelectorAll(".dot")[input.length-1].classList.add("on");
+  if(input.length===PASS.length){
+    if(input===PASS){
+      screen_lock.style.display="none";
+      startFirework();
+    }else resetPin();
+  }
+}
+function resetPin(){
+  input="";
+  document.querySelectorAll(".dot").forEach(d=>d.classList.remove("on"));
+}
+
+/* ---------- พลุ ---------- */
+function startFirework(){
+  screen_firework.style.display="block";
+  let t=setInterval(()=>{
+    const f=document.createElement("div");
+    f.className="firework";
+    f.style.left=Math.random()*100+"vw";
+    f.style.background=`hsl(${Math.random()*360},100%,60%)`;
+    screen_firework.appendChild(f);
+    setTimeout(()=>f.remove(),1500);
+  },200);
+  setTimeout(()=>{
+    clearInterval(t);
+    screen_firework.style.display="none";
+  },5000);
+}
+</script>
+
+<!-- ⬇️ ตรงนี้คือโค้ดเดิมของคุณทั้งหมด (ไม่แก้) -->
+<!-- วางโค้ดเดิมของคุณต่อจากตรงนี้ได้เลย -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+
+<!-- กำหนดชุดอักขระเป็น UTF-8 เพื่อให้ภาษาไทยไม่เพี้ยน -->
+<meta charset="UTF-8">
+
+<!-- ทำให้เว็บรองรับมือถือ / iPad / ทุกขนาดจอ -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ชื่อเว็บที่แสดงบนแท็บ -->
+<title>1 Year Anniversary 💙</title>
+
+<style>
+/* ===============================
+   ตัวแปรสีหลัก ใช้ทั้งเว็บ
+================================ */
+
+/* :root คือการประกาศตัวแปร CSS กลาง */
+:root{
+  --bg1:#eef4ff;   /* สีพื้นหลังอ่อน */
+  --bg2:#dbe8ff;   /* สีพื้นหลังกลาง */
+  --bg3:#e3dcff;   /* สีม่วงอ่อน */
+  --deep:#4f5b82;  /* สีตัวอักษรเข้ม */
+}
+
+/* ===============================
+   reset ค่าพื้นฐาน
+================================ */
+
+/* * = ทุก element */
+*{
+  box-sizing:border-box;                 /* คำนวณขนาด element ให้ง่าย */
+  font-family:"Segoe UI",system-ui,sans-serif; /* ฟอนต์อ่านง่าย */
+}
+
+/* ===============================
+   พื้นหลังหลักของเว็บ
+================================ */
+body{
+  margin:0;                               /* ลบ margin เริ่มต้น */
+  min-height:100vh;                      /* สูงอย่างน้อยเต็มจอ */
+  background:linear-gradient(135deg,
+    var(--bg1),var(--bg2),var(--bg3));   /* ไล่สีพื้นหลัง */
+  overflow:hidden;                       /* ซ่อนของลอยนอกจอ */
+}
+
+/* ===============================
+   เอฟเฟคแสงเรือง (Glow)
+================================ */
+
+/* กล่องแสงเรือง */
+.glow{
+  position:fixed;                        /* ติดกับหน้าจอ */
+  width:520px;                           /* ความกว้าง */
+  height:520px;                          /* ความสูง */
+  background:radial-gradient(circle,
+    rgba(160,190,255,.65),
+    transparent 70%);                    /* แสงฟุ้ง */
+  filter:blur(90px);                     /* เบลอ */
+  animation:move 26s infinite alternate ease-in-out; /* แอนิเมชัน */
+  z-index:0;                             /* อยู่ชั้นล่าง */
+}
+
+/* ตำแหน่ง glow ตัวที่ 1 */
+.g1{
+  top:-220px;
+  left:-200px;
+}
+
+/* ตำแหน่ง glow ตัวที่ 2 */
+.g2{
+  bottom:-240px;
+  right:-200px;
+  animation-delay:6s;                    /* ดีเลย์การขยับ */
+}
+
+/* แอนิเมชันขยับ glow */
+@keyframes move{
+  to{transform:translateY(160px);}       /* เลื่อนลง */
+}
+
+/* ===============================
+   ชั้นของสิ่งที่ลอยทั้งหมด
+================================ */
+.bg{
+  position:fixed;                        /* ติดหน้าจอ */
+  inset:0;                               /* ครอบเต็มจอ */
+  pointer-events:none;                   /* คลิกทะลุ */
+  z-index:1;                             /* อยู่เหนือ glow */
+}
+
+/* ===============================
+   รูปลอย
+================================ */
+.float-img{
+  position:absolute;                     /* ลอยอิสระ */
+  bottom:-80px;                          /* เริ่มจากด้านล่าง */
+  width:30px;                            /* ขนาดรูป */
+  height:30px;
+  border-radius:50%;                     /* วงกลม */
+  object-fit:cover;                     /* ครอบรูป */
+  opacity:.85;                           /* โปร่งเล็กน้อย */
+  animation:rise linear forwards;        /* ลอยขึ้น */
+  box-shadow:0 6px 14px rgba(120,150,255,.35); /* เงา */
+}
+
+/* ===============================
+   หัวใจ / ดาว / ดอกไม้
+================================ */
+.floating{
+  position:absolute;                     /* ลอยอิสระ */
+  bottom:-60px;                          /* เริ่มล่างจอ */
+  font-size:18px;                        /* ขนาด emoji */
+  animation:rise linear forwards;        /* ใช้แอนิเมชันเดียวกัน */
+  opacity:.7;                            /* โปร่ง */
+}
+
+/* ===============================
+   แอนิเมชันลอยขึ้น
+================================ */
+@keyframes rise{
+  from{
+    transform:translateY(0) scale(.9);   /* จุดเริ่ม */
+    opacity:0;
+  }
+  20%{opacity:1;}                        /* ค่อย ๆ โผล่ */
+  to{
+    transform:translateY(-120vh) scale(1.15); /* ลอยออกจอ */
+    opacity:0;
+  }
+}
+
+/* ===============================
+   หน้า Intro (หน้าทางเข้า)
+================================ */
+#intro{
+  position:fixed;                        /* เต็มจอ */
+  inset:0;
+  display:flex;                          /* จัดกลาง */
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#9fc4ff,#b19cff); /* พื้นหลัง */
+  z-index:50;                            /* อยู่บนสุด */
+  transition:1.2s ease;                 /* fade ออก */
+}
+
+/* การ์ด intro */
+.intro-card{
+  background:rgba(255,255,255,.25);      /* ใสโปร่ง */
+  backdrop-filter:blur(28px);            /* เบลอด้านหลัง */
+  padding:90px 60px;                     /* ระยะขอบ */
+  border-radius:60px;                    /* มุมโค้ง */
+  text-align:center;                     /* ตัวอักษรกลาง */
+  color:#fff;                            /* ตัวอักษรขาว */
+  box-shadow:0 40px 120px rgba(0,0,0,.25); /* เงา */
+}
+
+/* หัวข้อ intro */
+.intro-card h1{
+  font-size:40px;
+  margin-bottom:18px;
+}
+
+/* ปุ่มเข้า */
+.intro-card button{
+  margin-top:46px;
+  padding:20px 70px;
+  border:none;
+  border-radius:50px;
+  font-size:18px;
+  cursor:pointer;
+  background:#fff;
+  color:#6a7dff;
+  box-shadow:0 12px 30px rgba(0,0,0,.25);
+}
+
+/* ===============================
+   หน้าหลัก
+================================ */
+.main{
+  position:relative;
+  z-index:10;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;                             /* ซ่อนก่อน */
+  transform:translateY(40px);
+  transition:1.2s ease;
+}
+
+/* เมื่อแสดง */
+.main.show{
+  opacity:1;
+  transform:none;
+}
+
+/* ===============================
+   การ์ดกลาง
+================================ */
+.card{
+  max-width:460px;
+  background:rgba(235,245,255,.9);       /* ฟ้าอ่อน */
+  backdrop-filter:blur(30px);
+  border-radius:54px;
+  padding:52px 36px;
+  text-align:center;
+  box-shadow:
+    0 45px 120px rgba(120,170,255,.35),
+    0 0 40px rgba(180,210,255,.45);
+}
+
+/* ===============================
+   รูปคู่
+================================ */
+.photo-wrap{
+  width:200px;
+  height:200px;
+  margin:0 auto 28px;
+}
+
+.photo{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  overflow:hidden;
+  border:7px solid #fff;
+}
+
+.photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* ===============================
+   ข้อความ
+================================ */
+h2{
+  font-size:32px;
+  color:var(--deep);
+}
+
+.names{
+  font-size:19px;
+  color:#6a78a0;
+}
+
+/* ป้าย 1Y */
+.badge{
+  margin-top:16px;
+  padding:12px 28px;
+  border-radius:30px;
+  background:linear-gradient(135deg,#9fc4ff,#b19cff);
+  color:#fff;
+  display:inline-block;
+  box-shadow:0 8px 20px rgba(120,140,255,.45);
+}
+
+/* เวลาคบ */
+#loveTime{
+  margin-top:18px;
+  font-size:14px;
+  color:#5a6a8f;
+  line-height:1.8;
+}
+
+/* กล่องข้อความ */
+.message{
+  margin-top:22px;
+  padding:18px 20px;
+  border-radius:20px;
+  background:#f1f6ff;
+  color:#4f5f88;
+  font-size:15px;
+}
+
+/* Responsive มือถือ */
+@media (max-width:600px){
+  .card{max-width:90%;}
+  .intro-card{padding:70px 40px;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- แสงเรือง -->
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<!-- ชั้นของสิ่งลอย -->
+<div class="bg" id="bg"></div>
+
+<!-- หน้าหลัก -->
+<div class="main" id="main">
+  <div class="card">
+
+    <div class="photo-wrap">
+      <div class="photo">
+        <img src="main.jpg">
+      </div>
+    </div>
+
+    <h2>Happy Anniversary</h2>
+    <div class="names">เอิร์ท 🤍 น้องโอปอ</div>
+    <div class="badge">1Y • 08/02/25</div>
+
+    <div id="loveTime"></div>
+
+    <div class="message">
+      เขียนอะไรดีน้าา 💙  
+      สกีบีดี้ทอยเลต
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===============================
+   ฟังก์ชันเข้าเว็บ
+================================ */
+function enter(){
+  document.getElementById("intro").style.opacity=0; /* fade out */
+  setTimeout(()=>{
+    document.getElementById("intro").style.display="none"; /* ซ่อน */
+    document.getElementById("main").classList.add("show"); /* แสดงหน้า main */
+  },1200);
+}
+
+/* ===============================
+   นับเวลาคบ
+================================ */
+function updateLoveTime(){
+  const start=new Date(2025,1,8,7,40,0); /* วันเริ่มคบ */
+  const now=new Date();                 /* เวลาปัจจุบัน */
+  let d=Math.floor((now-start)/1000);   /* วินาทีทั้งหมด */
+
+  const day=Math.floor(d/86400); d%=86400;
+  const h=Math.floor(d/3600); d%=3600;
+  const m=Math.floor(d/60);
+  const s=d%60;
+
+  loveTime.innerHTML=
+    `กี่วันแล้วววววววววววววววววว 💕<br>
+     ${day} วัน ${h} ชั่วโมง ${m} นาที ${s} วินาที`;
+}
+
+/* เรียกทุก 1 วินาที */
+setInterval(updateLoveTime,1000);
+updateLoveTime();
+
+/* ===============================
+   รูปลอย
+================================ */
+const imgs=["pic1.jpg","pic2.jpg","pic3.jpg","pic4.jpg","pic5.jpg","pic6.jpg"];
+
+setInterval(()=>{
+  const i=document.createElement("img"); /* สร้างรูป */
+  i.src=imgs[Math.floor(Math.random()*imgs.length)];
+  i.className="float-img";
+  i.style.left=Math.random()*100+"vw";
+  i.style.animationDuration=(12+Math.random()*6)+"s";
+  bg.appendChild(i);
+  setTimeout(()=>i.remove(),22000);
+},400);
+
+/* ===============================
+   หัวใจ / ดาว / ดอกไม้
+================================ */
+const icons=["🤍","💙","✨","⭐","🌸","🌼"];
+
+setInterval(()=>{
+  const f=document.createElement("div");
+  f.className="floating";
+  f.innerText=icons[Math.floor(Math.random()*icons.length)];
+  f.style.left=Math.random()*100+"vw";
+  f.style.animationDuration=(11+Math.random()*6)+"s";
+  bg.appendChild(f);
+  setTimeout(()=>f.remove(),20000);
+},650);
+</script>
+
+</body>
+</html>
